@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:permisos/bloc/permiso_cubit.dart';
+import 'package:permisos/bloc/notification_cubit.dart';
 import 'package:permisos/pages/home_page.dart';
 
 void main() {
@@ -13,8 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<NotificacionCubit>(
-          create: (context) => NotificacionCubit(),
+        BlocProvider<NotificationCubit>(
+          create: (context) => NotificationCubit(),
         ),
       ],
       child: MaterialApp(

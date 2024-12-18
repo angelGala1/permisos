@@ -2,11 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:permisos/bloc/permiso_cubit.dart';
-import 'package:permisos/bloc/permiso_state.dart';
+import 'package:permisos/bloc/notification_cubit.dart';
+import 'package:permisos/bloc/notification_state.dart';
 import 'package:permisos/pages/home_page.dart';
 import 'package:permisos/utils/preferencias.dart';
-
 class CustomDialog extends StatelessWidget {
   const CustomDialog({super.key});
 
@@ -16,35 +15,34 @@ class CustomDialog extends StatelessWidget {
     final width = size.width;
     final height = size.height;
     return Scaffold(
-      body: BlocListener<NotificacionCubit, NotificacionEstado>(
-        listener: (context, estado) {
-          if (estado.estatus == Estatus.exito) {
-            // Si el permiso fue concedido con éxito
+      body: BlocListener<NotificationCubit, NotificationState>(
+        listener: (context, state) {
+          if (state.status == Status.success) {
+            // If permission was successfully granted
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(estado.mensaje)),
+              SnackBar(content: Text(state.message)),
             );
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (_) => const HomePage()),
-              (route) => false, // Elimina todas las rutas anteriores
+              (route) => false, // Remove all previous routes
             );
-          } else if (estado.estatus == Estatus.error) {
-            // Si hubo un error
+          } else if (state.status == Status.error) {
+            // If there was an error
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(estado.mensaje)),
+              SnackBar(content: Text(state.message)),
             );
           }
         },
         child: Padding(
           padding: EdgeInsets.symmetric(
               horizontal: width * 0.05,
-              vertical: height *
-                  0.02), // Ajusta el padding según el tamaño de la pantalla
+              vertical: height * 0.02), // Adjust padding based on screen size
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: width * 0.1),
-              // Imagen desde assets alineada a la izquierda
+              // Image from assets aligned to the left
               Container(
                 alignment: Alignment.centerLeft,
                 child: Image.asset(
@@ -76,18 +74,15 @@ class CustomDialog extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     if (Platform.isIOS) {
-                      // En iOS, solicita permiso de notificaciones
                       await context
-                          .read<NotificacionCubit>()
-                          .solicitarPermisoNotificaciones();
+                          .read<NotificationCubit>()
+                          .requestNotificationPermission();
                     } else if (Platform.isAndroid) {
-                      // En Android, abre directamente la configuración para habilitar las notificaciones
-
                       await context
-                          .read<NotificacionCubit>()
-                          .abrirConfiguracionManual();
+                          .read<NotificationCubit>()
+                          .openAppSettingsManually();
                     }
-                    Navigator.pop(context, true); // Cierra el diálogo
+                    Navigator.pop(context, true); // Close the dialog
                   },
                   icon: const Icon(Icons.message, size: 20),
                   label: Text(
@@ -110,22 +105,16 @@ class CustomDialog extends StatelessWidget {
                   const Icon(Icons.delete),
                   TextButton(
                     onPressed: () async {
-                      // Marcar el diálogo como mostrado para no mostrarlo nuevamente
-                      final preferenciasServicio = PreferenciasServicio();
-                      await preferenciasServicio.marcarDialogoComoMostrado();
-                      // Redirigir al login y mostrar el mensaje
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => const HomePage()),
-                        (route) => false, // Elimina todas las rutas anteriores
-                      );
+                      final preferencesService = PreferencesService();
+                      await preferencesService.markDialogAsShown();
+                      
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text(
-                            'Usted no permitió los servicios.',
-                          ),
+                          content: Text('You did not allow the services.'),
                         ),
                       );
+                      
+                      Navigator.pop(context, false); 
                     },
                     child: Text(
                       "Not now",

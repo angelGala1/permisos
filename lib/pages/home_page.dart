@@ -4,6 +4,7 @@ import 'package:permisos/pages/custom_dialog.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -12,26 +13,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final PreferenciasServicio _preferenciasServicio = PreferenciasServicio();
+  final PreferencesService _preferencesService = PreferencesService();
 
   @override
   void initState() {
     super.initState();
-    _verificarSiMostrarDialogo();
+    _checkIfDialogShouldBeShown();
   }
 
-  Future<void> _verificarSiMostrarDialogo() async {
-    final bool yaMostrado =
-        await _preferenciasServicio.verificarSiDialogoYaSeMostro();
+  Future<void> _checkIfDialogShouldBeShown() async {
+    final bool alreadyShown =
+        await _preferencesService.checkIfDialogAlreadyShown();
 
-    if (!yaMostrado) {
-      final resultado = await Navigator.push(
+    if (!alreadyShown) {
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const CustomDialog()),
       );
 
-      if (resultado == true) {
-        await _preferenciasServicio.marcarDialogoComoMostrado();
+      if (result == true) {
+        await _preferencesService.markDialogAsShown();
       }
     }
   }
@@ -39,22 +40,21 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Página Principal')),
+      appBar: AppBar(title: const Text('Home Page')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Bienvenido a la App'),
+            const Text('Welcome to the App'),
             const SizedBox(height: 20),
-            Text('Este es el inicio'),
+            Text('This is the home screen'),
             ElevatedButton(
               onPressed: () {
-                // Lógica para ir a otra página
+                // Logic to navigate to another page
                 // Navigator.push(context, MaterialPageRoute(builder: (_) => const NextPage()));
               },
-              child: const Text('Ir a la siguiente página'),
+              child: const Text('Go to the next page'),
             ),
-            
           ],
         ),
       ),
