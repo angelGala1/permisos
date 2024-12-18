@@ -12,10 +12,12 @@ class CustomDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
     return Scaffold(
       body: BlocListener<NotificacionCubit, NotificacionEstado>(
         listener: (context, estado) {
-          // Revisamos el estatus del estado
           if (estado.estatus == Estatus.exito) {
             // Si el permiso fue concedido con éxito
             ScaffoldMessenger.of(context).showSnackBar(
@@ -34,38 +36,43 @@ class CustomDialog extends StatelessWidget {
           }
         },
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.05,
+              vertical: height *
+                  0.02), // Ajusta el padding según el tamaño de la pantalla
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              SizedBox(height: width * 0.1),
               // Imagen desde assets alineada a la izquierda
               Container(
                 alignment: Alignment.centerLeft,
                 child: Image.asset(
                   'assets/png/campana.png',
-                  width: 35,
-                  height: 35,
+                  width: width * 0.1,
+                  height: width * 0.1,
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: width * 0.05),
+              Text(
                 "Imagine missing a match because you didn't see it?",
-                style: TextStyle(fontSize: 27, fontWeight: FontWeight.w800),
+                style: TextStyle(
+                    fontSize: width * 0.079, fontWeight: FontWeight.w800),
               ),
-              const SizedBox(height: 8),
-              const Padding(
-                padding: EdgeInsets.only(right: 30),
+              SizedBox(height: width * 0.02),
+              Padding(
+                padding: EdgeInsets.only(right: width * 0.05),
                 child: Text(
                   "Turn on your notifications so we can let you know when you have new messages or matches.",
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(
+                      fontSize: width * 0.05, fontWeight: FontWeight.w600),
                 ),
               ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: height * 0.08,
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     if (Platform.isIOS) {
@@ -76,19 +83,16 @@ class CustomDialog extends StatelessWidget {
                     } else if (Platform.isAndroid) {
                       // En Android, abre directamente la configuración para habilitar las notificaciones
 
-                      // await context
-                      //     .read<NotificacionCubit>()
-                      //     .abrirConfiguracionManual();
                       await context
                           .read<NotificacionCubit>()
-                          .solicitarPermisoNotificaciones();
+                          .abrirConfiguracionManual();
                     }
                     Navigator.pop(context, true); // Cierra el diálogo
                   },
                   icon: const Icon(Icons.message, size: 20),
-                  label: const Text(
+                  label: Text(
                     "Allow notifications",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: width * 0.043),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
@@ -123,14 +127,15 @@ class CustomDialog extends StatelessWidget {
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       "Not now",
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                      style: TextStyle(
+                          fontSize: width * 0.043, color: Colors.black54),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: width * 0.06),
             ],
           ),
         ),
